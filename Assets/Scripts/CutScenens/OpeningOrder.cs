@@ -25,8 +25,15 @@ public class OpeningOrder : MonoBehaviour
     private bool runningW;
     private bool end;
 
+    private AudioSource gAudio, wAudio;
+    [SerializeField] AudioClip[] clips;
+    private bool gClipping, wClipping, pClipping;
+
     private void Start()
     {
+        gAudio = KnightGirl.GetComponent<AudioSource>();
+        wAudio = EvilWizard.GetComponent<AudioSource>();
+
         EvilWizard.transform.position = wTransforms[0].position;
         EvilWizard.SetActive(false);
         pMoving = true;
@@ -38,7 +45,7 @@ public class OpeningOrder : MonoBehaviour
         }
         else
         {
-            
+
         }
         pPosition = new Vector3(cutsceneSpeed, 0, 0);
         gPosition = new Vector3(cutsceneSpeed, 0, 0);
@@ -60,12 +67,33 @@ public class OpeningOrder : MonoBehaviour
 
         if (MoveTo(KnightGirl, gTransforms[0], gAnimator, gPosition))
         {
+            if (!gClipping)
+            {
+                gAudio.Pause();
+                gAudio.clip = clips[0];
+                gAudio.Play();
+                gAudio.loop = true;
+                gClipping = true;
+            }
             standing = true;
         }
         else
         {
             gMoving = false;
+            if (gClipping && !wAppear)
+            {
+                gAudio.Pause();
+                gClipping = false;
+                gAudio.loop = false;
+            }
             KnightGirl.transform.rotation = Quaternion.Euler(0, 180, 0);
+            if (!pClipping)
+            {
+                gAudio.Pause();
+                gAudio.clip = clips[1];
+                gAudio.Play();
+                pClipping = true;
+            }
             gAnimator.SetFloat("MoveX", 0);
             KnightGirl.gameObject.GetComponent<Rigidbody2D>().simulated = false;
         }
@@ -91,11 +119,24 @@ public class OpeningOrder : MonoBehaviour
         {
             if (FlyingTo(KnightGirl, gTransforms[1], gAnimator, gPosition))
             {
-
+                if (!gClipping)
+                {
+                    gAudio.Pause();
+                    gAudio.clip = clips[2];
+                    gAudio.Play();
+                    gClipping = true;
+                }
             }
             else
             {
-
+                if (!wClipping)
+                {
+                    mBtn.GetComponent<AudioSource>().Pause();
+                    mBtn.GetComponent<AudioSource>().clip = clips[3];
+                    mBtn.GetComponent<AudioSource>().Play();
+                    mBtn.GetComponent<AudioSource>().loop = false;
+                    wClipping = true;
+                }
                 wAnimator.SetBool("IsAttacking", true);
                 if (EvilWizard.GetComponent<WizardAttackState>().attacked && wAppear)
                 {
@@ -127,7 +168,7 @@ public class OpeningOrder : MonoBehaviour
             }
             else
             {
-                
+
                 if (end)
                 {
                     mBtn.NextScene(1);
@@ -142,17 +183,17 @@ public class OpeningOrder : MonoBehaviour
 
     private bool MoveTo(GameObject person, Transform transform, Animator animator, Vector3 direction)
     {
-            if (person.transform.position.x < transform.position.x)
-            {
-                person.transform.position += direction;
+        if (person.transform.position.x < transform.position.x)
+        {
+            person.transform.position += direction;
 
-                animator.SetFloat("MoveX", 1);
-            }
-            else
-            {
-                animator.SetFloat("MoveX", 0);
-            }
-            return person.transform.position.x < transform.position.x;
+            animator.SetFloat("MoveX", 1);
+        }
+        else
+        {
+            animator.SetFloat("MoveX", 0);
+        }
+        return person.transform.position.x < transform.position.x;
     }
 
     private bool FlyingTo(GameObject person, Transform transform, Animator animator, Vector3 direction)

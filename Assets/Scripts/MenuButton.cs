@@ -9,6 +9,7 @@ public class MenuButton : MonoBehaviour
 {
     [SerializeField] Canvas screen;
     [SerializeField] TextMeshProUGUI currentPoints;
+    [SerializeField] AudioClip transition;
 
     [SerializeField] public Button returnToMenuBtn;
 
@@ -68,6 +69,10 @@ public class MenuButton : MonoBehaviour
 
     public void NextScene(int level)
     {
+        this.GetComponent<AudioSource>().Pause();
+        this.GetComponent<AudioSource>().clip = transition;
+        this.GetComponent<AudioSource>().Play();
+        this.GetComponent<AudioSource>().loop = false;
         Time.timeScale = 1;
         paused = false;
         alpha = 0;
@@ -110,14 +115,10 @@ public class MenuButton : MonoBehaviour
         }
     }
 
-    //public void OnPlayerDeath()
-    //{
-    //    for(int i = 0; i < otherUis.Length; i++)
-    //    {
-    //        otherUis[i].SetActive(false);
-    //    }
-    //    gameOverUi.SetActive(true);
-        
-    //}
+    public void OnPlayerDeath()
+    {
+        this.GetComponent<AudioSource>().Pause();
+
+    }
 
 }

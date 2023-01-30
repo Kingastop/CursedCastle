@@ -41,6 +41,13 @@ namespace Player
 
         private bool dead;
 
+        private bool landed;
+        private bool clipped;
+        int num = 1;
+
+        [SerializeField] AudioSource pAudio;
+        [SerializeField] AudioClip[] clips;
+
         void Awake()
         {
             Left.eulerAngles = Vector3.zero;
@@ -81,7 +88,8 @@ namespace Player
             if (!attacking)
             {
                 attacking = true;
-                animator.SetInteger("AttackNum", UnityEngine.Random.Range(0, 2));
+                num = UnityEngine.Random.Range(1, 3);
+                animator.SetInteger("AttackNum", num);
                 animator.SetBool("IsAttack", true);
             }
         }
@@ -91,15 +99,50 @@ namespace Player
             if (!attacking)
             {
                 if (direction == 0)
+                {
+                    if (m_Grounded && landed)
+                    {
+                        pAudio.loop = false;
+                    }
+                    else
+                    {
+                        if (!clipped)
+                        {
+                            pAudio.clip = clips[3];
+                            pAudio.Play();
+                            pAudio.loop = false;
+                            clipped = true;
+                        }
+                    }
                     SetDefaultState();
+                }
                 else
+                {
+                    if (m_Grounded && landed)
+                    {
+                        pAudio.Pause();
+                        pAudio.clip = clips[0];
+                        pAudio.loop = true;
+                        pAudio.Play();
+                    }
+                    else
+                    {
+                        if (!clipped)
+                        {
+                            pAudio.clip = clips[3];
+                            pAudio.Play();
+                            pAudio.loop = false;
+                            clipped = true;
+                        }
+                    }
                     SetRunState(direction);
+                }
             }
         }
 
         public void SetRunState(float value)
         {
-            if(standing)
+            if (standing)
                 animator.SetFloat("MoveX", value);
 
 
@@ -132,18 +175,35 @@ namespace Player
                 standing = false;
                 animator.SetBool("IsJump", true);
                 m_Grounded = false;
+                landed = false;
+                pAudio.Pause();
+                pAudio.clip = clips[3];
+                pAudio.Play();
+                pAudio.loop = false;
                 rbody.AddForce(new Vector2(0f, jumpForce), ForceMode2D.Impulse);
             }
         }
 
         public void OnLanding()
         {
+            clipped = false;
+            if (!landed)
+            {
+                pAudio.Pause();
+                pAudio.clip = clips[4];
+                pAudio.Play();
+                pAudio.loop = false;
+
+            }
+            landed = true;
             animator.SetBool("IsJump", false);
             SetDefaultState();
         }
 
         public void SetCrouchState(float value)
         {
+            pAudio.Pause();
+            pAudio.loop = false;
             animator.SetBool("IsCrouch", true);
             standing = false;
         }
@@ -158,6 +218,11 @@ namespace Player
 
         private void Attack()
         {
+            pAudio.Pause();
+            pAudio.clip = clips[num];
+            pAudio.Play();
+            pAudio.loop = false;
+
             Collider2D[] colliders = Physics2D.OverlapCircleAll(attackPoint.position, attackRadius, LayerMask.GetMask("Enemy", "Obstacle"));
 
             for (int i = 0; i < colliders.Length; i++)
@@ -166,13 +231,13 @@ namespace Player
                 {
                     colliders[i].GetComponent<EnemyStateMachine>().SetDeathState(true);
                 }
-                if(colliders[i].GetComponent<ObstacleLogic>() != null)
+                if (colliders[i].GetComponent<ObstacleLogic>() != null)
                 {
                     colliders[i].GetComponent<ObstacleLogic>().SetDestroyed(true);
                 }
             }
         }
-        
+
         private void EndOfAnimation()
         {
             if (attacking)
@@ -191,15 +256,23 @@ namespace Player
                 GameManager.instance.SetRecord();
                 inputUi.SetActive(false);
                 gameOverMenu.SetActive(true);
+
                 inputUi.GetComponent<MenuButton>().returnToMenuBtn.gameObject.transform.SetParent(gameOverMenu.transform, false);
+                inputUi.GetComponent<MenuButton>().OnPlayerDeath();
+
+                gameOverMenu.GetComponent<AudioSource>().Pause();
+                gameOverMenu.GetComponent<AudioSource>().clip = clips[6];
+                gameOverMenu.GetComponent<AudioSource>().Play();
+
                 DataPersistanceManager.Instance.SaveGame();
-                //Menu + dramatic music
             }
         }
 
         public void SetDefaultState()
         {
+            pAudio.Pause();
             standing = true;
+
         }
 
 
@@ -219,6 +292,10 @@ namespace Player
         {
             if (dead)
             {
+                pAudio.Pause();
+                pAudio.clip = clips[5];
+                pAudio.Play();
+                pAudio.loop = false;
                 animator.SetBool("IsDead", true);
                 disabledInput = true;
                 this.dead = dead;
@@ -228,7 +305,7 @@ namespace Player
 
         public bool AttackEnds(bool a = false)
         {
-            
+
             return a;
         }
 

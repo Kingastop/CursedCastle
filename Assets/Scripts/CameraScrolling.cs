@@ -83,7 +83,6 @@ public class CameraScrolling : MonoBehaviour
 
     private void SpawnMap(Vector3 position)
     {
-        Debug.Log(mapNum);
         if (mapNum == 0)
         {
             mapNum = UnityEngine.Random.Range(1, levelStaticData.maps.Length);

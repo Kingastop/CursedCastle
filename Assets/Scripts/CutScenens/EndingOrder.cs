@@ -40,8 +40,13 @@ public class EndingOrder : MonoBehaviour
     private bool endimage;
     Image shade;
 
+    private AudioSource gAudio;
+    [SerializeField] AudioClip[] clips;
+    private bool clipping;
+
     private void Start()
     {
+        gAudio = KnightGirl.GetComponent<AudioSource>();
 
         KnightGirl.SetActive(false);
         Goblin1.SetActive(false);
@@ -112,8 +117,15 @@ public class EndingOrder : MonoBehaviour
                     Disappear();
                     if (iter < 3)
                         enemy.GetComponent<EnemyStateMachine>().SetDeathState(true);
-                    else
+                    else if(iter == 3)
                     {
+                        if (!clipping)
+                        {
+                            gAudio.Pause();
+                            gAudio.clip = clips[0];
+                            gAudio.Play();
+                            clipping = true;
+                        }
                         enemyAnim.SetBool("IsDead", true);
                         end = true;
                         pMoving = true;
@@ -135,6 +147,13 @@ public class EndingOrder : MonoBehaviour
         {
             if (Time.time > lastTime + timer)
             {
+                if (clipping)
+                {
+                    gAudio.Pause();
+                    gAudio.clip = clips[1];
+                    gAudio.Play();
+                    clipping = false;
+                }
                 if (MoveBack(Player, enemyLeft, pAnimator, -pPosition))
                 {
 
@@ -159,6 +178,11 @@ public class EndingOrder : MonoBehaviour
 
                         if (!ending)
                         {
+
+                            mBtn.GetComponent<AudioSource>().Pause();
+                            mBtn.GetComponent<AudioSource>().clip = clips[2];
+                            mBtn.GetComponent<AudioSource>().Play();
+
                             lastTime = Time.time;
                             canvas.gameObject.SetActive(true);
                             shade = canvas.GetComponent<Image>();
@@ -201,7 +225,7 @@ public class EndingOrder : MonoBehaviour
         {
             if (Time.time > lastTime + timer)
             {
-                if(alpha > 1)
+                if (alpha > 1)
                     mBtn.NextScene(1);
                 alpha = 0;
             }

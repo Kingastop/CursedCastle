@@ -45,6 +45,9 @@ namespace Enemy
 
         private int rewardPoints;
 
+        [SerializeField] AudioSource eAudio;
+        [SerializeField] AudioClip[] clips;
+
         void Start()
         {
             Left.eulerAngles = Vector3.zero;
@@ -119,6 +122,9 @@ namespace Enemy
 
         private void Attack()
         {
+            eAudio.Pause();
+            eAudio.clip = clips[0];
+            eAudio.Play();
             if (rangedEnemy)
             {
                 rangeAttack.OnAttacked();
@@ -146,7 +152,12 @@ namespace Enemy
         {
             if (SetDeathState(dead))
             {
-                Destroy(gameObject);
+                eAudio.Pause();
+                eAudio.clip = clips[2];
+                eAudio.Play();
+                this.GetComponent<Rigidbody2D>().simulated = false;
+                this.GetComponent<Collider2D>().isTrigger = true;
+                Destroy(gameObject, 1);
             }
             if (attacked)
             {
@@ -159,6 +170,9 @@ namespace Enemy
         {
             if (dead)
             {
+                eAudio.Pause();
+                eAudio.clip = clips[1];
+                eAudio.Play();
                 animator.SetBool("IsDead", true);
                 this.dead = dead;
             }
