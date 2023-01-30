@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e266657a09f0bce4da292ef225da0350, type: 3}
+  m_Name: Level Static Data
+  m_EditorClassIdentifier: 
+  maps:
+  - Map: {fileID: 5746710595307701984, guid: e0c2c66e3db1d2349be4220ae447bfd1, type: 3}
+    SpawnPoints: {fileID: 0}
+  - Map: {fileID: 1817065340744183324, guid: 32f709cdf648cbb469aa0f4e851db5ac, type: 3}
+    SpawnPoints: {fileID: 1549576443073243127, guid: 32f709cdf648cbb469aa0f4e851db5ac, type: 3}
+  - Map: {fileID: 5774732675246765449, guid: 6a28d18d1dd2c0642809a257271b0ab5, type: 3}
+    SpawnPoints: {fileID: 6773700896853074026, guid: 6a28d18d1dd2c0642809a257271b0ab5, type: 3}
+  - Map: {fileID: 1217544269544542795, guid: 5fb0f579de2c24c4fbe8f1299b18c8aa, type: 3}
+    SpawnPoints: {fileID: 5868078514093751743, guid: 5fb0f579de2c24c4fbe8f1299b18c8aa, type: 3}
